@@ -181,15 +181,15 @@ function Navbar() {
                     LogOut
                   </button>
                 ) : (
+                  <NavLink to="/signin">
                   <button
                     type="button"
                     className="border-2 w-full border-blue-500 rounded-2xl p-2 bg-blue-500 text-white font-bold cursor-pointer text-sm md:text-md"
                   >
-                    <NavLink to="/signin">
                       <i className="fa-solid fa-user mr-2"></i>
                       Sign in
-                    </NavLink>
                   </button>
+                  </NavLink>
                 )}
               </li>
             </ul>

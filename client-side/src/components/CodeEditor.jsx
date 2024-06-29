@@ -30,7 +30,6 @@ function CodeEditor() {
 
     function onMount(editor) {
         editorRef.current=editor;
-        editor.focus();
     }
     
     function handleLanguageClick(language) {
