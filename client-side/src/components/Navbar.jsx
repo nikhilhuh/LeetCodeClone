@@ -127,6 +127,7 @@ function Navbar() {
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
+              
             ) : (
               <svg
                 onClick={toggleDropdown}
@@ -151,6 +152,9 @@ function Navbar() {
         {isOpen && (
           <div className="lg:hidden bg-slate-700 text-white relative z-10">
             <ul className="flex flex-col space-y-4 p-4">
+              {isLoggedIn ? (<li>
+                Hi, {username}
+              </li>) : ('')}
               <li className="hover:font-bold">
                 <NavLink
                   to="/home"
