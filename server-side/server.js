@@ -11,7 +11,7 @@ app.use(cors({
   origin: "*"
 }));
 
-app.post('https://leetcodeclone.onrender.com', async (req, res) => {
+app.post('https://leetcodeclone.onrender.com/run', async (req, res) => {
   if (!req.body || !req.body.code || typeof req.body.code !== 'string' || !req.body.language) {
     return res.status(400).send({ error: 'Invalid request body' });
   }
