@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import leetcodeimg from "../images/leetcode.png";
-import { auth , firestore } from "../firebase.js";
-import { doc, getDoc } from 'firebase/firestore';
+import { auth , } from "../firebase.js";
 import { toast } from 'react-toastify';
 
 function Navbar() {
