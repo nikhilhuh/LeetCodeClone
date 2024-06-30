@@ -1,9 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const { exec } = require('child_process');
 const fs = require('fs');
 const cors = require('cors');
-const { v4: uuidv4 } = require('uuid');
-const { c, cpp, node, python, java } = require('compile-run');
+const path = require('path');
+const { v4: uuidv4 } = require('uuid');;
 
 const app = express();
 app.use(bodyParser.json());
@@ -11,39 +12,50 @@ app.use(cors({
   origin: "*"
 }));
 
-app.post('https://leetcodeclone.onrender.com/run', async (req, res) => {
+app.post('/run', (req, res) => {
   if (!req.body || !req.body.code || typeof req.body.code !== 'string' || !req.body.language) {
     return res.status(400).send({ error: 'Invalid request body' });
   }
 
   const { code, language, input } = req.body;
+  // console.log("Input:", input);
 
-  let fileName, executionPromise;
+  let inputFileName;
+  inputFileName = path.join(__dirname, `input-${uuidv4()}.txt`);
+  // Save the input to a file
+  fs.writeFileSync(inputFileName, input || '');
+  //  console.log(`Input written to file: ${inputFileName}`);
+
+
+  let fileName, outputFile, command;
 
   switch (language) {
+
     case 'c':
-      fileName = `code-${uuidv4()}.c`;
-      executionPromise = c.runFile(fileName, { stdin: input });
+      fileName = path.join(__dirname, `code-${uuidv4()}.c`);
+      outputFile = path.join(__dirname, `output-${uuidv4()}.exe`);
+      command = `gcc -o "${outputFile}" "${fileName}"`;
       break;
 
     case 'cpp':
-      fileName = `code-${uuidv4()}.cpp`;
-      executionPromise = cpp.runFile(fileName, { stdin: input });
+      fileName = path.join(__dirname, `codet-${uuidv4()}.cpp`);
+      outputFile = path.join(__dirname, `output-${uuidv4()}.exe`);
+      command = `g++ -o "${outputFile}" "${fileName}" -lstdc++`;
       break;
 
     case 'java':
-      fileName = `code-${uuidv4()}.java`;
-      executionPromise = java.runFile(fileName, { stdin: input });
+      fileName = path.join(__dirname, `code-${uuidv4()}.java`);
+      command = `javac "${fileName}"`;
       break;
 
     case 'python':
-      fileName = `code-${uuidv4()}.py`;
-      executionPromise = python.runFile(fileName, { stdin: input });
+      fileName = path.join(__dirname, `code-${uuidv4()}.py`);
+      command = `"C:/Program Files/Python312/python.exe" "${fileName}"`;
       break;
 
     case 'javascript':
-      fileName = `code-${uuidv4()}.js`;
-      executionPromise = node.runFile(fileName, { stdin: input });
+      fileName = path.join(__dirname,`code-${uuidv4()}.js`);
+      command = `node "${fileName}"`;
       break;
 
     default:
@@ -51,27 +63,133 @@ app.post('https://leetcodeclone.onrender.com/run', async (req, res) => {
   }
 
   // Save the code to a file
-  fs.writeFile(fileName, code, async (err) => {
+  fs.writeFile(fileName, code, (err) => {
     if (err) {
       console.error('Error writing file:', err);
       return res.status(500).send({ error: 'Error writing file' });
     }
 
-    try {
-      const { stdout, stderr } = await executionPromise;
-      res.send({ output: stdout || stderr });
-    } catch (execError) {
-      console.error('Execution error:', execError);
-      res.status(400).send({ error: execError.toString() });
-    } finally {
-      // Cleanup: Delete the file
-      fs.unlink(fileName, (unlinkErr) => {
-        if (unlinkErr) console.error(`Error deleting file: ${fileName}`);
-        else console.log(`File deleted: ${fileName}`);
+    // console.log(`Code written to file: ${fileName}`);
+
+    // Compile or directly execute depending on the language
+    if (language === 'java') {
+      exec(command, (compileErr, compileStdout, compileStderr) => {
+        if (compileErr) {
+          console.error('Compile error:', compileStderr);
+          cleanupFiles(fileName);
+          setTimeout(() => cleanupFiles(inputFileName), 1000);
+          return res.status(400).send({ error: compileStderr });
+        }
+
+        console.log("Compilation Successful");
+
+        // Execute the compiled Java program
+        const javaCode = code
+        const className = javaCode.match(/class (\w+)/)[1];
+        // console.log("ClassName: ",className)
+        const ExecutionfileName = path.join(__dirname,`${className}.class`);
+        // console.log("Execution File Name:",ExecutionfileName);
+        exec(`java ${className} < "${inputFileName}"`, (runErr, runStdout, runStderr) => {
+          if (runErr) {
+            console.error('Runtime error:', runStderr);
+            cleanupFiles(ExecutionfileName);
+            setTimeout(() => cleanupFiles(inputFileName), 1000);
+            return res.status(400).send({ error: runStderr });
+          }
+
+          console.log("Execution Successful");
+          res.send({ output: runStdout });
+          cleanupFiles(ExecutionfileName);
+           // Cleanup: Delete the input files with a delay
+           setTimeout(() => cleanupFiles(inputFileName), 1000);
+
+          // Cleanup: Delete the files with a delay
+          setTimeout(() => cleanupFiles(fileName, `${fileName.split('.')[0]}.class`), 1000);
+        });
+      });
+    } else if (language === 'python') {
+      // For Python, execute directly
+      exec(`${command} < "${inputFileName}"`, (runErr, runStdout, runStderr) => {
+        if (runErr) {
+          console.error('Runtime error:', runStderr);
+          cleanupFiles(fileName);
+          setTimeout(() => cleanupFiles(inputFileName), 1000);
+          return res.status(400).send({ error: runStderr });
+        }
+
+        console.log("Execution Successful");
+        res.send({ output: runStdout });
+        // Cleanup: Delete the input files with a delay
+        setTimeout(() => cleanupFiles(inputFileName), 1000);
+
+        // Cleanup: Delete the files with a delay
+        setTimeout(() => cleanupFiles(fileName), 1000);
+      });
+    } else if (language === 'javascript') {
+      // For JavaScript, execute directly
+      exec(`${command} < "${inputFileName}"`, (runErr, runStdout, runStderr) => {
+        if (runErr) {
+          console.error('Runtime error:', runStderr);
+          cleanupFiles(fileName);
+          setTimeout(() => cleanupFiles(inputFileName), 1000);
+          return res.status(400).send({ error: runStderr });
+        }
+
+        console.log("Execution Successful");
+        res.send({ output: runStdout });
+        // Cleanup: Delete the input files with a delay
+        setTimeout(() => cleanupFiles(inputFileName), 1000);
+
+        // Cleanup: Delete the files with a delay
+        setTimeout(() => cleanupFiles(fileName), 1000);
+      });
+    }
+    else    {
+      // For C and C++, compile and then execute
+      exec(command, (compileErr, compileStdout, compileStderr) => {
+        if (compileErr) {
+          console.error('Compile error:', compileStderr);
+          cleanupFiles(fileName, outputFile);
+          setTimeout(() => cleanupFiles(inputFileName), 1000);
+          return res.status(400).send({ error: compileStderr });
+        }
+
+        console.log("Compilation Successful");
+
+        // Execute the compiled program
+        exec(`"${outputFile}" < "${inputFileName}"`, (runErr, runStdout, runStderr) => {
+          if (runErr) {
+            console.error('Runtime error:', runStderr);
+            cleanupFiles(fileName, outputFile);
+            setTimeout(() => cleanupFiles(inputFileName), 1000);
+            return res.status(400).send({ error: runStderr });
+          }
+
+          console.log("Execution Successful");
+          res.send({ output: runStdout });
+
+          // Cleanup: Delete the input files with a delay
+          setTimeout(() => cleanupFiles(inputFileName), 1000);
+
+          // Cleanup: Delete the files with a delay
+          setTimeout(() => cleanupFiles(fileName, outputFile), 1000);
+        })
       });
     }
   });
+
 });
+
+function cleanupFiles(...files) {
+  files.forEach((file) => {
+    if (fs.existsSync(file)) {
+      fs.unlink(file, (err) => {
+        if (err) console.error(`Error deleting file: ${file}`);
+        else console.log(`File deleted: ${file}`);
+      });
+    }
+  });
+}
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
