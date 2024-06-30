@@ -41,7 +41,11 @@ function CodeEditor() {
     const submitCode = ()=>{
         // console.log(code)
         setLoading(true)
+<<<<<<< HEAD
         axios.post('https://leetcodeclone.onrender.com', { code , language , input })
+=======
+        axios.post('https://leetcodeclone.onrender.com/run', { code , language , input })
+>>>>>>> e64bea04024186543bb0bc7370165fbaebcae8fd
         .then(response => {
           console.log("Response: ",response.data)
             setOutput(response.data.output);
