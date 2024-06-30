@@ -11,7 +11,7 @@ function Home() {
             {/* page body starts here */}
             <CodeEditor />
             {/* page body ends here */}
-            <Footer />
+            <div className="hidden lg:block"><Footer /></div>
         </>
     );
 }

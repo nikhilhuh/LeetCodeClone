@@ -1,0 +1,15 @@
+# render.yaml
+
+services:
+  - type: web
+    name: online-compiler
+    env: node
+    plan: free  # Choose the appropriate plan
+    buildCommand: |
+      apt-get update && \
+      apt-get install -y build-essential gcc g++ default-jdk python3 python3-pip && \
+      npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
