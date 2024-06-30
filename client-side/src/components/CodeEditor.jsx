@@ -18,12 +18,19 @@ function CodeEditor() {
     const [CodeButton , setCodeButton] = useState(true)
     const [OutputButton , setOutputButton] = useState(false)
     const [loading , setLoading] = useState(false)
+    const [codeEditorTheme , setCodeEditorTheme] = useState("vs-dark")
+
+    function handleCodeEditorTheme() {
+      if(codeEditorTheme == "vs-dark")
+        setCodeEditorTheme("vs-light")
+      else setCodeEditorTheme("vs-dark")
+    }
 
     function codeButtonClicked() {
       setCodeButton(true)
       setOutputButton(false)
     }
-    function outputButtonClicked() {
+    function outputShow() {
       setCodeButton(false)
       setOutputButton(true)
     }
@@ -39,7 +46,6 @@ function CodeEditor() {
 
 
     const submitCode = ()=>{
-        // console.log(code)
         setLoading(true)
         axios.post('https://leetcodeclone.onrender.com/run', { code , language , input })
         .then(response => {
@@ -110,13 +116,13 @@ function CodeEditor() {
           </abbr>
 
           <div className={`md:hidden ${ language === ""? 'hidden' : 'inline'} text-black font-mono text-md mt-2`}>
-              main.{language}
+              {language}
           </div>
 
 
         </div>
 
-        <div className="ml-2 h-5/6 md:h-full md:w-[calc(100%-4rem)] w-[calc(100%-3rem)] lg:flex justify-center lg:flex-row lg:justify-around">
+        <div className="ml-2 h-full w-full mr-2 md:mr-0 md:w-[calc(100%-4rem)] lg:flex justify-center lg:flex-row lg:justify-around">
           
           {/* For lg screens and above */}
           <div className="hidden lg:block bg-gray-200 h-[calc(100%-4rem)] w-1/2">
@@ -125,6 +131,13 @@ function CodeEditor() {
                 <div className="text-white font-mono text-lg mt-1">
                   main.{language}
                 </div>
+              </div>
+              <div>
+                <abbr title={`${codeEditorTheme === "vs-dark" ? "Light Mode" : "Dark Mode"}`}>
+                  <button className='text-white text-md border-2 border-white p-1 w-8' onClick={handleCodeEditorTheme}>
+                  <i class="fa-regular fa-lightbulb"></i>
+                  </button>
+                </abbr>
               </div>
               <div className={`${ language === ""? 'hidden' : 'inline'}`}>
                 <div id="run_button">
@@ -137,11 +150,11 @@ function CodeEditor() {
               </div>  
             </div>
 
-            <div className="h-full w-full">
+            <div className="h-full w-full relative z-0">
             <Editor
             height="100%"
             width="100%"
-             theme="vs-dark"
+             theme={codeEditorTheme}
              language={language}
              defaultValue={CodeSnippets[language]}
              onMount={onMount}
@@ -221,7 +234,7 @@ function CodeEditor() {
                       {/* output-area button */}
                       <div className='ml-1'>
                         <button className={`${OutputButton === true ? 'bg-gray-600 font-bold text-white' : 'bg-white text-black'} border-2 border-white w-max p-2 text-md`} onClick={()=>{
-                          outputButtonClicked()
+                          outputShow()
                         }}>
                           Output
                         </button>
@@ -237,11 +250,19 @@ function CodeEditor() {
                         Clear Output
                     </button>
                   </div>
+                  <div>
+                <abbr title={`${codeEditorTheme === "vs-dark" ? "Light Mode" : "Dark Mode"}`}>
+                  <button className='text-white text-md border-2 border-white p-1 w-8' onClick={handleCodeEditorTheme}>
+                  <i class="fa-regular fa-lightbulb"></i>
+                  </button>
+                </abbr>
+              </div>
 
                     {/* run button */}
                   <div className='flex place-content-end'>
                     <button className='border-2 border-blue-500 bg-blue-500 w-max p-2 text-md max-h-max text-white font-bold' onClick={()=>{
                         submitCode()
+                        outputShow()
                         }}>
                          Run
                     </button>
@@ -254,7 +275,7 @@ function CodeEditor() {
                   <Editor
                       height="100%"
                       width="100%"
-                      theme="vs-dark"
+                      theme={codeEditorTheme}
                       language={language}
                       defaultValue={CodeSnippets[language]}
                       onMount={onMount}
@@ -305,11 +326,11 @@ function CodeEditor() {
           </div>
 
 
-          {/* for smaller screens */}
-          <div className="block bg-gray-200 h-[calc(100%-4rem)] w-full md:hidden ">
+          {/* for mobile screens */}
+          <div className="bg-gray-200 h-[calc(100%-4rem)] w-[calc(100%-5px)] md:hidden ">
 
                   {/* Top Black bar */}
-                <div className={`bg-black p-2 h-16 flex justify-between align-center w-full`}>
+                <div className={`bg-black p-2 h-16 flex justify-between items-center w-full`}>
                   <div className={`flex justify-center`}>
                       {/* code-area button */}
                       <div>
@@ -323,12 +344,19 @@ function CodeEditor() {
                       {/* output-area button */}
                       <div className='ml-1'>
                         <button className={`${OutputButton === true ? 'bg-gray-600 font-bold text-white' : 'bg-white text-black'} border-2 border-white w-max p-2 text-sm`} onClick={()=>{
-                          outputButtonClicked()
+                          outputShow()
                         }}>
                           Output
                         </button>
                       </div>
 
+                  </div>
+                  <div className='items-center'>
+                  <abbr title={`${codeEditorTheme === "vs-dark" ? "Light Mode" : "Dark Mode"}`}>
+                    <button className='text-white text-md border-2 border-white p-1 w-8' onClick={handleCodeEditorTheme}>
+                      <i class="fa-regular fa-lightbulb"></i>
+                    </button>
+                    </abbr>
                   </div>
 
 
@@ -336,6 +364,7 @@ function CodeEditor() {
                   <div className='flex place-content-end'>
                     <button className='border-2 border-blue-500 bg-blue-500 w-max p-2 text-sm max-h-max text-white font-bold' onClick={()=>{
                         submitCode()
+                        outputShow()  
                         }}>
                          Run
                     </button>
@@ -349,7 +378,7 @@ function CodeEditor() {
                       fontsize = "12"
                       height="100%"
                       width="100%"
-                      theme="vs-dark"
+                      theme={codeEditorTheme}
                       language={language}
                       defaultValue={CodeSnippets[language]}
                       onMount={onMount}
@@ -382,7 +411,7 @@ function CodeEditor() {
 
                   {/* Output area */}
                   {loading ? (
-                      <div className='h-[calc(100%-4rem)] w-full p-4 text-sm font-mono resize-none overflow-auto bg-gray-950 text-white'>
+                      <div className='h-[calc(100%-4rem)] w-full p-4 text-lg font-mono resize-none overflow-auto bg-gray-950 text-white'>
                       <ClipLoader size = {50}
                       color={'#123abc'}
                       loading={loading} />
@@ -393,7 +422,7 @@ function CodeEditor() {
                         value={output}
                         placeholder="---Your Code Execution Area---"
                         readOnly
-                        className="h-[calc(100%-4rem)] w-full p-4 text-sm font-mono resize-none overflow-auto bg-gray-950 text-white"
+                        className="h-[calc(100%-4rem)] w-full p-4 text-lg font-mono resize-none overflow-auto bg-gray-950 text-white"
                     ></textarea>)}
                  </div>
           
