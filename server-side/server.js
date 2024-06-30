@@ -4,7 +4,7 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const cors = require('cors');
 const path = require('path');
-const { v4: uuidv4 } = require('uuid');;
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 app.use(bodyParser.json());
@@ -18,19 +18,13 @@ app.post('/run', (req, res) => {
   }
 
   const { code, language, input } = req.body;
-  // console.log("Input:", input);
 
-  let inputFileName;
-  inputFileName = path.join(__dirname, `input-${uuidv4()}.txt`);
-  // Save the input to a file
+  let inputFileName = path.join(__dirname, `input-${uuidv4()}.txt`);
   fs.writeFileSync(inputFileName, input || '');
-  //  console.log(`Input written to file: ${inputFileName}`);
-
 
   let fileName, outputFile, command;
 
   switch (language) {
-
     case 'c':
       fileName = path.join(__dirname, `code-${uuidv4()}.c`);
       outputFile = path.join(__dirname, `output-${uuidv4()}.exe`);
@@ -38,7 +32,7 @@ app.post('/run', (req, res) => {
       break;
 
     case 'cpp':
-      fileName = path.join(__dirname, `codet-${uuidv4()}.cpp`);
+      fileName = path.join(__dirname, `code-${uuidv4()}.cpp`);
       outputFile = path.join(__dirname, `output-${uuidv4()}.exe`);
       command = `g++ -o "${outputFile}" "${fileName}" -lstdc++`;
       break;
@@ -50,11 +44,11 @@ app.post('/run', (req, res) => {
 
     case 'python':
       fileName = path.join(__dirname, `code-${uuidv4()}.py`);
-      command = `"C:/Program Files/Python312/python.exe" "${fileName}"`;
+      command = `python3 "${fileName}"`;  // Use python3 for Linux
       break;
 
     case 'javascript':
-      fileName = path.join(__dirname,`code-${uuidv4()}.js`);
+      fileName = path.join(__dirname, `code-${uuidv4()}.js`);
       command = `node "${fileName}"`;
       break;
 
@@ -62,16 +56,12 @@ app.post('/run', (req, res) => {
       return res.status(400).send({ error: 'Unsupported language' });
   }
 
-  // Save the code to a file
   fs.writeFile(fileName, code, (err) => {
     if (err) {
       console.error('Error writing file:', err);
       return res.status(500).send({ error: 'Error writing file' });
     }
 
-    // console.log(`Code written to file: ${fileName}`);
-
-    // Compile or directly execute depending on the language
     if (language === 'java') {
       exec(command, (compileErr, compileStdout, compileStderr) => {
         if (compileErr) {
@@ -81,34 +71,20 @@ app.post('/run', (req, res) => {
           return res.status(400).send({ error: compileStderr });
         }
 
-        console.log("Compilation Successful");
-
-        // Execute the compiled Java program
-        const javaCode = code
-        const className = javaCode.match(/class (\w+)/)[1];
-        // console.log("ClassName: ",className)
-        const ExecutionfileName = path.join(__dirname,`${className}.class`);
-        // console.log("Execution File Name:",ExecutionfileName);
+        const className = code.match(/class (\w+)/)[1];
         exec(`java ${className} < "${inputFileName}"`, (runErr, runStdout, runStderr) => {
           if (runErr) {
             console.error('Runtime error:', runStderr);
-            cleanupFiles(ExecutionfileName);
+            cleanupFiles(fileName);
             setTimeout(() => cleanupFiles(inputFileName), 1000);
             return res.status(400).send({ error: runStderr });
           }
 
-          console.log("Execution Successful");
           res.send({ output: runStdout });
-          cleanupFiles(ExecutionfileName);
-           // Cleanup: Delete the input files with a delay
-           setTimeout(() => cleanupFiles(inputFileName), 1000);
-
-          // Cleanup: Delete the files with a delay
-          setTimeout(() => cleanupFiles(fileName, `${fileName.split('.')[0]}.class`), 1000);
+          setTimeout(() => cleanupFiles(inputFileName, `${fileName.split('.')[0]}.class`), 1000);
         });
       });
-    } else if (language === 'python') {
-      // For Python, execute directly
+    } else if (language === 'python' || language === 'javascript') {
       exec(`${command} < "${inputFileName}"`, (runErr, runStdout, runStderr) => {
         if (runErr) {
           console.error('Runtime error:', runStderr);
@@ -117,35 +93,10 @@ app.post('/run', (req, res) => {
           return res.status(400).send({ error: runStderr });
         }
 
-        console.log("Execution Successful");
         res.send({ output: runStdout });
-        // Cleanup: Delete the input files with a delay
-        setTimeout(() => cleanupFiles(inputFileName), 1000);
-
-        // Cleanup: Delete the files with a delay
-        setTimeout(() => cleanupFiles(fileName), 1000);
+        setTimeout(() => cleanupFiles(inputFileName, fileName), 1000);
       });
-    } else if (language === 'javascript') {
-      // For JavaScript, execute directly
-      exec(`${command} < "${inputFileName}"`, (runErr, runStdout, runStderr) => {
-        if (runErr) {
-          console.error('Runtime error:', runStderr);
-          cleanupFiles(fileName);
-          setTimeout(() => cleanupFiles(inputFileName), 1000);
-          return res.status(400).send({ error: runStderr });
-        }
-
-        console.log("Execution Successful");
-        res.send({ output: runStdout });
-        // Cleanup: Delete the input files with a delay
-        setTimeout(() => cleanupFiles(inputFileName), 1000);
-
-        // Cleanup: Delete the files with a delay
-        setTimeout(() => cleanupFiles(fileName), 1000);
-      });
-    }
-    else    {
-      // For C and C++, compile and then execute
+    } else {
       exec(command, (compileErr, compileStdout, compileStderr) => {
         if (compileErr) {
           console.error('Compile error:', compileStderr);
@@ -154,9 +105,6 @@ app.post('/run', (req, res) => {
           return res.status(400).send({ error: compileStderr });
         }
 
-        console.log("Compilation Successful");
-
-        // Execute the compiled program
         exec(`"${outputFile}" < "${inputFileName}"`, (runErr, runStdout, runStderr) => {
           if (runErr) {
             console.error('Runtime error:', runStderr);
@@ -165,19 +113,12 @@ app.post('/run', (req, res) => {
             return res.status(400).send({ error: runStderr });
           }
 
-          console.log("Execution Successful");
           res.send({ output: runStdout });
-
-          // Cleanup: Delete the input files with a delay
-          setTimeout(() => cleanupFiles(inputFileName), 1000);
-
-          // Cleanup: Delete the files with a delay
-          setTimeout(() => cleanupFiles(fileName, outputFile), 1000);
-        })
+          setTimeout(() => cleanupFiles(inputFileName, fileName, outputFile), 1000);
+        });
       });
     }
   });
-
 });
 
 function cleanupFiles(...files) {
