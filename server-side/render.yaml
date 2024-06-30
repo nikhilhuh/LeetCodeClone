@@ -3,6 +3,7 @@ services:
     name: online-compiler
     env: node
     plan: free
+    rootDir: .  # This specifies the root directory as the current directory (server-side)
     buildCommand: |
       echo "Updating apt-get..."
       apt-get update && echo "apt-get update successful" || (echo "apt-get update failed" && exit 1)
@@ -10,6 +11,8 @@ services:
       apt-get install -y build-essential gcc g++ default-jdk python3 python3-pip && echo "Installation successful" || (echo "Installation failed" && exit 1)
       echo "Installing npm packages..."
       npm install && echo "npm install successful" || (echo "npm install failed" && exit 1)
+      echo "Installing pygame..."
+      pip3 install pygame && echo "pygame install successful" || (echo "pygame install failed" && exit 1)
     startCommand: npm start
     envVars:
       - key: NODE_ENV

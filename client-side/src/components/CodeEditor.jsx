@@ -328,7 +328,7 @@ function CodeEditor() {
 
 
           {/* for mobile screens */}
-          <div className="bg-gray-200 h-[calc(100%-4rem)] w-[calc(100%-5px)] md:hidden ">
+          <div className="bg-gray-200 h-[calc(100%-6rem)] w-[calc(100%-5px)] md:hidden ">
 
                   {/* Top Black bar */}
                 <div className={`bg-black p-2 h-16 flex justify-between items-center w-full`}>
