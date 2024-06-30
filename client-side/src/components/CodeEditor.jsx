@@ -19,6 +19,8 @@ function CodeEditor() {
     const [OutputButton , setOutputButton] = useState(false)
     const [loading , setLoading] = useState(false)
     const [codeEditorTheme , setCodeEditorTheme] = useState("vs-dark")
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+
 
     function handleCodeEditorTheme() {
       if(codeEditorTheme == "vs-dark")
@@ -46,6 +48,7 @@ function CodeEditor() {
 
 
     const submitCode = ()=>{
+      setIsButtonDisabled(true)
         setLoading(true)
         axios.post('https://leetcodeclone.onrender.com/run', { code , language , input })
         .then(response => {
@@ -57,6 +60,7 @@ function CodeEditor() {
             setOutput(error.response ? error.response.data.error : 'Error executing code');
         }).finally(()=>{
           setLoading(false)
+          setIsButtonDisabled(false)
         })
         
     }
@@ -141,7 +145,7 @@ function CodeEditor() {
               </div>
               <div className={`${ language === ""? 'hidden' : 'inline'}`}>
                 <div id="run_button">
-                  <button className="border-2 border-blue-500 w-12 p-1 text-md font-bold text-white bg-blue-500" onClick={()=>{
+                  <button className={`${isButtonDisabled? "border-gray-500 bg-gray-500" : "border-blue-500 bg-blue-500"} border-2 w-12 p-1 text-md font-bold text-white`} disabled={isButtonDisabled} onClick={()=>{
                    submitCode()
                   }}>
                     Run
@@ -261,7 +265,7 @@ function CodeEditor() {
 
                     {/* run button */}
                   <div className='flex place-content-end'>
-                    <button className='border-2 border-blue-500 bg-blue-500 w-max p-2 text-md max-h-max text-white font-bold' onClick={()=>{
+                    <button className={`${isButtonDisabled? "border-gray-500 bg-gray-500" : "border-blue-500 bg-blue-500"} border-2 w-12 p-1 text-md font-bold text-white`} disabled={isButtonDisabled} onClick={()=>{
                         submitCode()
                         outputShow()
                         }}>
@@ -363,7 +367,7 @@ function CodeEditor() {
 
                     {/* run button */}
                   <div className='flex place-content-end'>
-                    <button className='border-2 border-blue-500 bg-blue-500 w-max p-2 text-sm max-h-max text-white font-bold' onClick={()=>{
+                    <button className={`${isButtonDisabled? "border-gray-500 bg-gray-500" : "border-blue-500 bg-blue-500"} border-2 w-12 p-1 text-md font-bold text-white`} disabled={isButtonDisabled} onClick={()=>{
                         submitCode()
                         outputShow()  
                         }}>
