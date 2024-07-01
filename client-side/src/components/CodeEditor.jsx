@@ -21,7 +21,6 @@ function CodeEditor() {
     const [codeEditorTheme , setCodeEditorTheme] = useState("vs-dark")
     const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
-
     function handleCodeEditorTheme() {
       if(codeEditorTheme == "vs-dark")
         setCodeEditorTheme("vs-light")
@@ -98,7 +97,7 @@ function CodeEditor() {
               onClick={() => handleLanguageClick("python")}
             />
           </abbr>
-          <abbr title="Java compiler">
+          {/* <abbr title="Java compiler">
             <img
               src={javaimg}
               alt="Java compiler"
@@ -107,7 +106,7 @@ function CodeEditor() {
               }`}
               onClick={() => handleLanguageClick("java")}
             />
-          </abbr>
+          </abbr> */}
           <abbr title="JavaScript compiler">
             <img
               src={jsimg}
@@ -131,7 +130,7 @@ function CodeEditor() {
           {/* For lg screens and above */}
           <div className="hidden lg:block bg-gray-200 h-[calc(100%-4rem)] w-1/2">
             <div className="bg-black p-2 h-14 flex justify-between align-center">
-              <div className={`${ language === ""? 'hidden' : 'inline'}`}>
+              <div className={`${ language === ""? 'hidden' : ''}`}>
                 <div className="text-white font-mono text-lg mt-1">
                   main.{language}
                 </div>
@@ -143,7 +142,7 @@ function CodeEditor() {
                   </button>
                 </abbr>
               </div>
-              <div className={`${ language === ""? 'hidden' : 'inline'}`}>
+              <div className={`${ language === ""? 'hidden' : ''}`}>
                 <div id="run_button">
                   <button className={`${isButtonDisabled? "border-gray-500 bg-gray-500" : "border-blue-500 bg-blue-500"} border-2 w-12 p-1 text-md font-bold text-white`} disabled={isButtonDisabled} onClick={()=>{
                    submitCode()
@@ -221,7 +220,7 @@ function CodeEditor() {
 
                   {/* Top Black bar */}
                 <div className={`bg-black p-2 h-16 flex justify-between align-center w-full`}>
-                  <div className={`${ language === ""? 'hidden' : 'inline'} text-white font-mono text-lg mt-2`}>
+                  <div className={`${ language === ""? 'hidden' : ''} text-white font-mono text-lg mt-2`}>
                     main.{language}
                   </div>
 
@@ -257,15 +256,15 @@ function CodeEditor() {
 
                   <div className={`${CodeButton === true ? '' : 'hidden'} items-center`}>
                 <abbr title={`${codeEditorTheme === "vs-dark" ? "Light Mode" : "Dark Mode"}`}>
-                  <button className='text-white text-md border-2 border-white p-1 w-8' onClick={handleCodeEditorTheme}>
+                  <button className='text-white text-md border-2 border-white p-1 w-8 mt-2' onClick={handleCodeEditorTheme}>
                   <i className={`${codeEditorTheme === "vs-light" ? 'fa-regular' : 'fa-solid'} fa-lightbulb`}></i>
                   </button>
                 </abbr>
               </div>
 
                     {/* run button */}
-                  <div className='flex place-content-end'>
-                    <button className={`${isButtonDisabled? "border-gray-500 bg-gray-500" : "border-blue-500 bg-blue-500"} border-2 w-12 p-1 text-md font-bold text-white`} disabled={isButtonDisabled} onClick={()=>{
+                  <div className={`${ language === ""? 'hidden' : ''}`}>
+                    <button className={`${isButtonDisabled? "border-gray-500 bg-gray-500" : "border-blue-500 bg-blue-500"} border-2 w-12 p-1 text-md font-bold text-white mt-2`} disabled={isButtonDisabled} onClick={()=>{
                         submitCode()
                         outputShow()
                         }}>
@@ -332,7 +331,7 @@ function CodeEditor() {
 
 
           {/* for mobile screens */}
-          <div className="bg-gray-200 h-[calc(100%-6rem)] w-[calc(100%-5px)] md:hidden ">
+          <div className="bg-gray-200 h-[calc(100%-8rem)] w-[calc(100%-5px)] md:hidden ">
 
                   {/* Top Black bar */}
                 <div className={`bg-black p-2 h-16 flex justify-between items-center w-full`}>
@@ -366,8 +365,8 @@ function CodeEditor() {
 
 
                     {/* run button */}
-                  <div className='flex place-content-end'>
-                    <button className={`${isButtonDisabled? "border-gray-500 bg-gray-500" : "border-blue-500 bg-blue-500"} border-2 w-12 p-1 text-md font-bold text-white`} disabled={isButtonDisabled} onClick={()=>{
+                  <div className={`${language === ""? 'hidden' : ''}`}>
+                    <button className={`${isButtonDisabled? "border-gray-500 bg-gray-500" : "border-blue-500 bg-blue-500"} border-2 w-12 p-1 text-md font-bold text-white mt-2`} disabled={isButtonDisabled} onClick={()=>{
                         submitCode()
                         outputShow()  
                         }}>
