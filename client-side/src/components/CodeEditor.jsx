@@ -257,7 +257,7 @@ function CodeEditor() {
                   <div className={`${CodeButton === true ? '' : 'hidden'} items-center`}>
                 <abbr title={`${codeEditorTheme === "vs-dark" ? "Light Mode" : "Dark Mode"}`}>
                   <button className='text-white text-md border-2 border-white p-1 w-8 mt-2' onClick={handleCodeEditorTheme}>
-                  <i className={`${codeEditorTheme === "vs-light" ? 'fa-regular' : 'fa-solid'} fa-lightbulb`}></i>
+                  <i className={`${codeEditorTheme === "vs-light" ? 'fa-regular' : 'fa-solid'} fa-moon`}></i>
                   </button>
                 </abbr>
               </div>
@@ -357,7 +357,7 @@ function CodeEditor() {
                   <div className={`${CodeButton === true ? '' : 'hidden'} items-center`}>
                   <abbr title={`${codeEditorTheme === "vs-dark" ? "Light Mode" : "Dark Mode"}`}>
                     <button className='text-white text-md border-2 border-white p-1 w-8' onClick={handleCodeEditorTheme}>
-                      <i className={`${codeEditorTheme === "vs-light" ? 'fa-regular' : 'fa-solid'} fa-lightbulb`}></i>
+                      <i className={`${codeEditorTheme === "vs-light" ? 'fa-regular' : 'fa-solid'} fa-moon`}></i>
                     </button>
                     </abbr>
                   </div>
