@@ -183,7 +183,7 @@ function CodeEditor() {
               <textarea
                           name="input"
                           id="input"
-                          placeholder="Enter input here..."
+                          placeholder="If your program contains any input, Enter here..."
                           value={input}
                           onChange={(e) => setInput(e.target.value)}
                           className="h-16 w-full p-4 text-lg font-mono resize-none bg-white border-2 border-gray-300"
@@ -274,8 +274,26 @@ function CodeEditor() {
 
                 </div>
 
-                {/* code-editor */}
-                <div className={`${CodeButton === true ? '' : 'hidden'} h-full w-full text-sm relative z-0`}>
+                {/* code-editor and input-area */}
+                {/* Input area */}
+                <div className='flex justify-between'>
+                    <textarea
+                          name="input"
+                          id="input"
+                          placeholder="If your program contains any input, Enter here..."
+                          value={input}
+                          onChange={(e) => setInput(e.target.value)}
+                          className="h-16 w-full p-4 text-lg font-mono resize-none bg-white border-2 border-black"
+                      >
+                    </textarea>
+                    <div id='clear_input_button'>
+                        <button className="border-2 border-black bg-black h-16 w-max p-2 text-md font-bold text-white" onClick={() => setInput('')}
+                          >
+                            Clear Input
+                        </button>
+                    </div>
+                  </div>
+                <div className={`${CodeButton === true ? '' : 'hidden'} h-[calc(100%-4rem)] w-full text-sm relative z-0`}>
                   <Editor
                       height="100%"
                       width="100%"
@@ -290,25 +308,6 @@ function CodeEditor() {
 
                 {/* input-and-output-area */}
                 <div className={`${OutputButton === true ? '' : 'hidden'} bg-gray-200 h-full w-full`}>
-                  
-                  {/* Input area */}
-                  <div className='flex justify-between'>
-                    <textarea
-                          name="input"
-                          id="input"
-                          placeholder="Enter input here..."
-                          value={input}
-                          onChange={(e) => setInput(e.target.value)}
-                          className="h-16 w-full p-4 text-lg font-mono resize-none bg-white border-2 border-black"
-                      >
-                    </textarea>
-                    <div id='clear_input_button'>
-                        <button className="border-2 border-black bg-black h-16 w-max p-2 text-md font-bold text-white" onClick={() => setInput('')}
-                          >
-                            Clear Input
-                        </button>
-                    </div>
-                  </div>
 
                   {/* Output area */}
                   {loading ? (
@@ -366,7 +365,7 @@ function CodeEditor() {
 
                     {/* run button */}
                   <div className={`${language === ""? 'hidden' : ''}`}>
-                    <button className={`${isButtonDisabled? "border-gray-500 bg-gray-500" : "border-blue-500 bg-blue-500"} border-2 w-12 p-1 text-md font-bold text-white mt-2`} disabled={isButtonDisabled} onClick={()=>{
+                    <button className={`${isButtonDisabled? "border-gray-500 bg-gray-500" : "border-blue-500 bg-blue-500"} border-2 w-12 p-1 text-md font-bold text-white items-center`} disabled={isButtonDisabled} onClick={()=>{
                         submitCode()
                         outputShow()  
                         }}>
@@ -376,8 +375,20 @@ function CodeEditor() {
 
                 </div>
 
-                {/* code-editor */}
-                <div className={`${CodeButton === true ? '' : 'hidden'} h-full w-full relative z-0`}>
+                {/* code-editor and input-area */}
+                {/* Input area */}
+                <div className='flex justify-between'>
+                    <textarea
+                          name="input"
+                          id="input"
+                          placeholder="If your program contains any input, Enter here..."
+                          value={input}
+                          onChange={(e) => setInput(e.target.value)}
+                          className="h-16 w-full p-4 text-sm font-mono resize-none bg-white border-2 border-black"
+                      >
+                    </textarea>
+                  </div>
+                <div className={`${CodeButton === true ? '' : 'hidden'} h-[calc(100%-4rem)] w-full relative z-0`}>
                   <Editor
                       fontsize = "12"
                       height="100%"
@@ -390,6 +401,7 @@ function CodeEditor() {
                       onChange={(e) => setcode(e)}
                       options={{
                         fontSize: 12,
+                        
                         minimap: {
                           enabled: false, // Add this line to hide the minimap
                         },
@@ -399,19 +411,6 @@ function CodeEditor() {
 
                 {/* input-and-output-area */}
                 <div className={`${OutputButton === true ? '' : 'hidden'} bg-gray-200 h-full w-full`}>
-                  
-                  {/* Input area */}
-                  <div className='flex justify-between'>
-                    <textarea
-                          name="input"
-                          id="input"
-                          placeholder="Enter input here..."
-                          value={input}
-                          onChange={(e) => setInput(e.target.value)}
-                          className="h-16 w-full p-4 text-sm font-mono resize-none bg-white border-2 border-black"
-                      >
-                    </textarea>
-                  </div>
 
                   {/* Output area */}
                   {loading ? (
