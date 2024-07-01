@@ -5,15 +5,11 @@ Team Members :- <br><br>
   <tr>
     <td>
       <strong>Name:</strong> Nikhil Tiwari<br>
-     
       <strong>Semester:</strong> 2nd<br>
-      
     </td>
     <td>
       <strong>Name:</strong> Himanshu Verma<br>
-      
       <strong>Semester:</strong> 2nd<br>
-     
     </td>
   </tr>
 </table>
