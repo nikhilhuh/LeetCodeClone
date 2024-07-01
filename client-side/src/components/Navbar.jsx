@@ -172,7 +172,7 @@ function Navbar() {
               </li>
               <li className="hover:font-bold">
                 <NavLink
-                  to="/contactus" className={({ isActive }) => `text-sm ${isActive || location.pathname === '/about' ? 'underline' : ''}`}>Contact Us</NavLink>
+                  to="/contactus" className={({ isActive }) => `text-sm ${isActive || location.pathname === '/contactus' ? 'underline' : ''}`}>Contact Us</NavLink>
               </li>
               <li>
                 {isLoggedIn ? (
