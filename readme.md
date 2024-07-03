@@ -32,7 +32,7 @@ User Authentication :<br>
 3. Sign out: Log out of your account to end your session.<br><br>
 
 Contact Us :<br>
-Users can contact us through a contact form or email address.<br><br>
+Users can contact us through a contact form .<br><br>
 
 Getting Started :<br>
 1. Optional - Sign in to your account or sign up for a new one.<br>
@@ -46,12 +46,11 @@ You can share your code with others by pasting and formatting the code into a po
 Future Scope :-<br>
 1. Cloud Storage for User Programs:<br>
 2. In the future, we plan to allow users to save their programs as files in the cloud. This will enable users to:<br>
-
-1. Save their programs and access them later from any device<br>
-2. Organize their programs into folders and projectsv
-3. Share their programs with others by sharing a link to the file<br>
-4. Collaborate with others on projects in real-time<br>
-5. To achieve this, we will integrate a cloud storage service such as Google <br>Drive, Dropbox, or Amazon S3. Users will be able to save their programs to their cloud storage account and access them later by logging in to their account.<br><br>
+ 1. Save their programs and access them later from any device<br>
+ 2. Organize their programs into folders and projects<br>
+ 3. Share their programs with others by sharing a link to the file<br>
+ 4. Collaborate with others on projects in real-time<br>
+ 5. To achieve this, we will integrate a cloud storage service such as Google <br>Drive, Dropbox, or Amazon S3. Users will be able to save their programs to their cloud storage account and access them later by logging in to their account.<br><br>
 
 Additional Features :-<br>
 1. We also plan to add the following features in the future:<br>

@@ -307,11 +307,11 @@ function CodeEditor() {
                 </div>
 
                 {/* input-and-output-area */}
-                <div className={`${OutputButton === true ? '' : 'hidden'} bg-gray-200 h-full w-full`}>
+                <div className={`${OutputButton === true ? '' : 'hidden'} bg-gray-200 h-[calc(100%-4rem)] w-full`}>
 
                   {/* Output area */}
                   {loading ? (
-                      <div className='h-[calc(100%-4rem)] w-full p-4 text-lg font-mono resize-none overflow-auto bg-gray-950 text-white'>
+                      <div className='h-full w-full p-4 text-lg font-mono resize-none overflow-auto bg-gray-950 text-white'>
                       <ClipLoader size = {50}
                       color={'#123abc'}
                       loading={loading} />
@@ -322,7 +322,7 @@ function CodeEditor() {
                         value={output}
                         placeholder="---Your Code Execution Area---"
                         readOnly
-                        className="h-[calc(100%-4rem)] w-full p-4 text-lg font-mono resize-none overflow-auto bg-gray-950 text-white"
+                        className="h-full w-full p-4 text-lg font-mono resize-none overflow-auto bg-gray-950 text-white"
                     ></textarea>)}
                  </div>
           
@@ -410,11 +410,11 @@ function CodeEditor() {
                 </div>
 
                 {/* input-and-output-area */}
-                <div className={`${OutputButton === true ? '' : 'hidden'} bg-gray-200 h-full w-full`}>
+                <div className={`${OutputButton === true ? '' : 'hidden'} bg-gray-200 h-[calc(100%-4rem)] w-full`}>
 
                   {/* Output area */}
                   {loading ? (
-                      <div className='h-[calc(100%-4rem)] w-full p-4 text-lg font-mono resize-none overflow-auto bg-gray-950 text-white'>
+                      <div className='h-full w-full p-4 text-lg font-mono resize-none overflow-auto bg-gray-950 text-white'>
                       <ClipLoader size = {50}
                       color={'#123abc'}
                       loading={loading} />
@@ -425,7 +425,7 @@ function CodeEditor() {
                         value={output}
                         placeholder="---Your Code Execution Area---"
                         readOnly
-                        className="h-[calc(100%-4rem)] w-full p-4 text-lg font-mono resize-none overflow-auto bg-gray-950 text-white"
+                        className="h-full w-full p-4 text-md font-mono resize-none overflow-auto bg-gray-950 text-white"
                     ></textarea>)}
                  </div>
           
