@@ -68,6 +68,14 @@ function Navbar() {
               </li>
               <li className="hover:font-bold">
                 <NavLink
+                  to="/potd"
+                  className={({ isActive }) => `text-md ${isActive || location.pathname === '/potd' ? 'underline' : ''} underline-offset-4`}
+                >
+                  Problem of the day
+                </NavLink>
+              </li>
+              <li className="hover:font-bold">
+                <NavLink
                   to="/about"
                   className={({ isActive }) => `text-md ${isActive || location.pathname === '/about' ? 'underline' : ''} underline-offset-4`}
                 >
