@@ -21,7 +21,8 @@
     "react-dom": "^18.2.0",
     "react-loaders": "^3.0.1",
     "react-spinners": "^0.14.1",
-    "react-toastify": "^10.0.5"
+    "react-toastify": "^10.0.5",
+    "sweetalert2": "^11.14.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

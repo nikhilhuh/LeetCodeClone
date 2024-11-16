@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { backend_url } from "../App";
 import axios from "axios";
 import { CodeSnippets } from "../components/CodeSnippets";
-
 import { ClipLoader } from "react-spinners";
+import Swal from 'sweetalert2'
 
 function POTD() {
   const [language, setLanguage] = useState("c");
@@ -13,7 +13,7 @@ function POTD() {
   const [codeEditorTheme, setCodeEditorTheme] = useState("vs-dark");
   const [loading, setLoading] = useState(false);
   const [problem, setProblem] = useState("");
-  const [output , setOutput] = useState("");
+  const [output, setOutput] = useState("");
 
   useEffect(() => {
     axios
@@ -36,31 +36,53 @@ function POTD() {
     setLanguage(selectedLanguage);
     setcode(CodeSnippets[selectedLanguage]);
   }
-  
-  function handleSubmit(){
-    setLoading(true)
-    let id=problem.id
+
+  function handleSubmit() {
+    setLoading(true);
+    let id = problem.id;
     axios
-    .post(`${backend_url}/api/potd/submit`, { code, language , id})
-    .then((response) => {
-      const { passedTestCases, failedTestCases , failedTestCasesList , visibleResults} = response.data;
-      // Optionally, log or display the results
-    console.log("Test Cases Passed:", passedTestCases);
-    console.log("Test Cases Failed:", failedTestCases);
-    console.log(failedTestCasesList);
-    console.log(visibleResults);
-    
-    
-    })
-    .catch((error) => {
-      console.log("Error:", error);
-      setOutput(
-        error.response ? error.response.data.error : "Error executing code"
-      );
-    })
-    .finally(() => {
-      setLoading(false);
-    });
+      .post(`${backend_url}/api/potd/submit`, { code, language, id })
+      .then((response) => {
+        const {
+          totalcases,
+          passedTestCases,
+          failedTestCases,
+          failedTestCasesList,
+        } = response.data;
+        const alertIcon = failedTestCases > 0 ? "warning" : "success";
+         // Optionally, log or display the results
+         Swal.fire({
+          icon: alertIcon,
+          title: "Test Case Results",
+          text: `${passedTestCases} / ${totalcases} test cases passed`,
+          customClass: {
+            popup: "max-w-[80vw] md:max-w-[60vw] p-4",  // Ensures it is responsive
+            title: "text-xl text-center",  // Centers the title
+            confirmButton: "bg-green-400 text-black font-bold hover:bg-green-600 outline-none",
+            footer: "text-sm text-left max-h-[50vh] overflow-auto text-center"
+          },
+          footer: failedTestCases > 0
+            ? `<strong>Failed Test Cases:</strong><br>
+                ${failedTestCasesList.map((testCase, index) => {
+                  return `Test Case ${testCase.testCase}: 
+                          <pre>Input: ${JSON.stringify(testCase.input)}</pre>
+                          <pre>Expected Output: ${testCase.expectedOutput}</pre>
+                          <pre>Your Output: ${testCase.userOutput}</pre><br><br>`;
+                }).join("")}`
+            : "All test cases passed!",
+        });
+        
+        
+      })
+      .catch((error) => {
+        console.log("Error:", error);
+        setOutput(
+          error.response ? error.response.data.error : "Error executing code"
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
 
   return (
@@ -99,6 +121,14 @@ function POTD() {
               </div>
             </div>
           ))}
+        </div>
+        <div className="space-y-2 ml-6">
+          <div className="font-bold">Constraints</div>
+          <ul className="list-disc ml-6">
+            {problem.constraints?.map((constraint, index) => (
+              <li key={index}>{constraint}</li>
+            ))}
+          </ul>
         </div>
       </div>
       {/* code- Editor */}
@@ -148,10 +178,18 @@ function POTD() {
             setcode={setcode}
             fontSize={12}
           />
-          <button onClick={handleSubmit} className={`z-99 absolute top-[90%] right-[10%] min-h-[40px] min-w-[86px] bg-green-600 px-4 py-2 rounded-lg font-bold text-black ${loading ? 'cursor-wait' : 'cursor-pointer'}`} disabled={loading}>
-            {loading? (
+          <button
+            onClick={handleSubmit}
+            className={`z-99 absolute top-[90%] right-[10%] min-h-[40px] min-w-[86px] bg-green-600 px-4 py-2 rounded-lg font-bold text-black ${
+              loading ? "cursor-wait" : "cursor-pointer"
+            }`}
+            disabled={loading}
+          >
+            {loading ? (
               <ClipLoader size={10} color={"#123abc"} loading={loading} />
-            ): ('Submit')}
+            ) : (
+              "Submit"
+            )}
           </button>
         </div>
       </div>

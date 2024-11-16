@@ -161,6 +161,57 @@ app.get("/api/potd", (req, res) => {
   res.json(problems);
 });
 
+function codeCompleter(language, code, problem) {
+  let boilerplate;
+
+  switch (language) {
+    case "c":
+      boilerplate = `
+      #include <stdio.h>
+      #include <stdlib.h>
+      
+      ${code}
+      
+      // Main function
+      int main() {
+          int* result;
+          int returnSize;
+      
+      ${problem.cases.map((testCase, index) => {
+          const numsArray = testCase.input.nums.join(", "); // Ensure numsArray is a valid C array initialization
+          return `
+          // Test case ${index + 1}
+          int nums${index + 1}[] = {${numsArray}};
+          int target${index + 1} = ${testCase.input.target};
+          int numsSize${index + 1} = sizeof(nums${index + 1}) / sizeof(nums${index + 1}[0]);
+      
+          // Call the function
+          result = twoSum(nums${index + 1}, numsSize${index + 1}, target${index + 1}, &returnSize);
+      
+          if (result) {
+              printf("[%d, %d]\\n", result[0], result[1]);
+              free(result); // Free allocated memory
+          } else {
+              printf("null\\n");
+          }
+          `;
+      }).join("")}
+      
+          return 0;
+      }
+      `;
+      
+      break;
+    
+    
+    default:
+      boilerplate = "// Unsupported language";
+  }
+
+  return boilerplate;
+}
+
+
 let fileName, outputFile, command;
 app.post("/api/potd/submit", (req, res) => {
   if (
@@ -173,13 +224,14 @@ app.post("/api/potd/submit", (req, res) => {
     return res.status(400).send({ error: "Invalid request body" });
   }
 
+   // Get problem details based on the id
+   const problem = problems
   const { code, language, id } = req.body;
-
-  // Get problem details based on the id
-  const problem = problems
-
-  let inputFileName = path.join(__dirname, `input-${uuidv4()}.txt`);
-  fs.writeFileSync(inputFileName, "" || ""); // Empty input for now
+  const completeCode = codeCompleter(language,code,problem)
+  // console.log(completeCode);
+  
+  // let inputFileName = path.join(__dirname, `input-${uuidv4()}.txt`);
+  // fs.writeFileSync(inputFileName, "" || ""); // Empty input for now
 
   switch (language) {
     case "c":
@@ -213,7 +265,7 @@ app.post("/api/potd/submit", (req, res) => {
       return res.status(400).send({ error: "Unsupported language" });
   }
 
-  fs.writeFile(fileName, code, (err) => {
+  fs.writeFile(fileName, completeCode, (err) => {
     if (err) {
       console.error("Error writing file:", err);
       return res.status(500).send({ error: "Error writing file" });
@@ -223,7 +275,6 @@ app.post("/api/potd/submit", (req, res) => {
     compileAndExecuteCode(
       problem,
       fileName,
-      inputFileName,
       language,
       command,
       res
@@ -231,7 +282,7 @@ app.post("/api/potd/submit", (req, res) => {
   });
 });
 
-function compileAndExecuteCode(problem, fileName, inputFileName, language, command, res) {
+function compileAndExecuteCode(problem, fileName, language, command, res) {
   // Compile the code first
   if (language === "java") {
     fs.readFile(fileName, 'utf-8', (err, code) => {
@@ -258,7 +309,7 @@ function compileAndExecuteCode(problem, fileName, inputFileName, language, comma
         }
 
         // Run each test case for Java
-        executeTestCases(problem, `java ${className}`, inputFileName, res);
+        executeTestCases(problem, `java ${className}`, res);
       });
     });
   } else {
@@ -271,94 +322,76 @@ function compileAndExecuteCode(problem, fileName, inputFileName, language, comma
       }
 
       // Run each test case for non-Java languages
-      executeTestCases(problem, `"${outputFile}"`, inputFileName, res);
+      executeTestCases(problem, `"${outputFile}"`, res);
     });
   }
 }
 
-function executeTestCases(problem, runCommand, inputFileName, res) {
+function executeTestCases(problem, runCommand, res) {
   let visibleResults = [];
   let failedTestCases = [];
   let passedTestCases = 0;
   let failedTestCaseCount = 0; 
 
-  function runTestCase(testCase, isHidden, callback) {
-    const input = typeof testCase.input === 'object' ? JSON.stringify(testCase.input) : testCase.input;
-  
-    // Write the input to the file
-    console.log("Writing input to file:", input);
-    fs.writeFileSync(inputFileName, input);
-  
-    // Run the test case with the specified command
-    exec(`${runCommand} < "${inputFileName}"`, (runErr, runStdout, runStderr) => {
-      if (runErr) {
-        console.error("Runtime error:", runStderr);
-        callback({ error: runStderr, passed: false });
-      } else {
-        // Debugging: Log the raw output
-        console.log(`Test Case Input:`, input);
-        console.log("Raw Output from C program:", runStdout);
-  
-        // Local variable for the user output specific to this test case
-        let userOutput = runStdout.trim();
-  
-        // Compare the output from the user with the expected output
-        const expectedOutput = String(testCase.output).trim();
-  
-        // Debugging: Log expected vs actual output comparison
-        console.log(`Expected Output: ${expectedOutput}`);
-        console.log(`User Output: ${userOutput}`);
-  
-        // If output is "null", compare it properly
-        const passed = userOutput === expectedOutput || (userOutput === 'null' && expectedOutput === 'null');
-  
-        // Pass the result for this specific test case
-        callback({ expectedOutput, userOutput, passed });
-      }
-    });
-  }
-  
-  
+  // Run the program with the test cases already injected in the code
+  exec(runCommand, (runErr, runStdout, runStderr) => {
+    if (runErr) {
+      console.error("Runtime error:", runStderr);
+      res.json({ error: runStderr });
+      return;
+    }
 
-  // Iterate through the 'cases' (hidden test cases) of the problem
-  problem.cases.forEach((testCase, index) => {
-    runTestCase(testCase, true, (result) => {
+    // Log the raw output from the program
+    console.log("Raw Output from C program:", runStdout);
+
+    // Assume that each test case's result is printed in a structured format, e.g., 
+    // Test case 1: Indices: [0, 1] or Test case 1: No solution found.
+    const outputLines = runStdout.trim().split("\n");
+
+    problem.cases.forEach((testCase, index) => {
+      // Get the expected output for the test case
+      const expectedOutput = String(testCase.output).trim();
+
+      // Extract the result from the program's output 
+      const userOutput = outputLines[index].trim();
+
+      // Compare the output from the user with the expected output
+      const passed = userOutput === expectedOutput || (userOutput === 'null' && expectedOutput === 'null');
+
       // Add the result of the test case to visibleResults
       visibleResults.push({
         testCase: index + 1,
         input: testCase.input,
-        expectedOutput: result.expectedOutput,
-        userOutput: result.userOutput,
-        passed: result.passed,
+        expectedOutput: expectedOutput,
+        userOutput: userOutput,
+        passed: passed,
       });
 
-      if (result.passed) passedTestCases++;
-      else failedTestCaseCount++;
-
-      // If a test case fails, add it to the failedTestCases list
-      if (!result.passed) {
+      // Count passed and failed test cases
+      if (passed) {
+        passedTestCases++;
+      } else {
+        failedTestCaseCount++;
         failedTestCases.push({
           testCase: index + 1,
           input: testCase.input,
-          expectedOutput: result.expectedOutput,
-          userOutput: result.userOutput,
-        });
-      }
-
-      // Check if all test cases are processed
-      if (visibleResults.length === problem.cases.length) {
-        // Send the final result in the response
-        res.json({
-          success: failedTestCaseCount === 0,
-          passedTestCases: passedTestCases,
-          failedTestCases: failedTestCaseCount,
-          visibleResults: visibleResults,
-          failedTestCasesList: failedTestCases,
+          expectedOutput: expectedOutput,
+          userOutput: userOutput,
         });
       }
     });
+
+    // Send the final result in the response
+    res.json({
+      totalcases : passedTestCases + failedTestCaseCount,
+      passedTestCases: passedTestCases,
+      failedTestCases: failedTestCaseCount,
+      failedTestCasesList: failedTestCases,
+    });
+    cleanupFiles(fileName, outputFile);
   });
 }
+
 
 
 const PORT = 3000;
