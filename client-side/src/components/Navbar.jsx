@@ -52,7 +52,7 @@ function Navbar() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
           <NavLink to="/home">
             <div className="h-10 flex items-center">
-              <div className="text-white ml-1 text-md md:text-2xl font-bold text-yellow-500">NH CODEBASE</div>  
+              <div className=" ml-1 text-md md:text-2xl font-bold text-yellow-500">NH CODEBASE</div>  
             </div>
           </NavLink>
           <div className="hidden lg:block">
