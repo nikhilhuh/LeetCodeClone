@@ -20,7 +20,7 @@ function CodeEditor({codeEditorTheme,
     width="100%"  // Ensures the editor takes full width
     theme={codeEditorTheme}
     language={language}
-    defaultValue={CodeSnippets[language]}
+    defaultValue={language ? code : CodeSnippets[language]}
     onMount={onMount}
     value={code}
     onChange={(newValue) => setcode(newValue)} // Handle code changes

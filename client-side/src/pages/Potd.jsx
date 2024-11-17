@@ -3,28 +3,30 @@ import CodeEditor from "../components/CodeEditor";
 import { useEffect } from "react";
 import { backend_url } from "../App";
 import axios from "axios";
-import { CodeSnippets } from "../components/CodeSnippets";
 import { ClipLoader } from "react-spinners";
 import Swal from 'sweetalert2'
 
 function POTD() {
   const [language, setLanguage] = useState("c");
-  const [code, setcode] = useState(CodeSnippets[language]);
   const [codeEditorTheme, setCodeEditorTheme] = useState("vs-dark");
   const [loading, setLoading] = useState(false);
-  const [problem, setProblem] = useState("");
-  const [output, setOutput] = useState("");
+  const [problem, setProblem] = useState({
+    skeleton_code: {}, // Ensure skeleton_code exists as an object
+  });
+  const [code, setcode] = useState("");
 
   useEffect(() => {
     axios
       .get(`${backend_url}/api/potd`)
       .then((response) => {
         setProblem(response.data); // Set the fetched data to state
+        setcode(response.data.skeleton_code[language] || "");
       })
       .catch((error) => {
         console.error("Error fetching product data:", error);
       });
   }, []);
+
 
   function handleCodeEditorTheme() {
     if (codeEditorTheme == "vs-dark") setCodeEditorTheme("vs-light");
@@ -34,7 +36,7 @@ function POTD() {
     const selectedLanguage = event.target.value;
     // console.log(selectedLanguage);
     setLanguage(selectedLanguage);
-    setcode(CodeSnippets[selectedLanguage]);
+    setcode(problem.skeleton_code[selectedLanguage]);
   }
 
   function handleSubmit() {
@@ -59,7 +61,7 @@ function POTD() {
             popup: "max-w-[80vw] md:max-w-[60vw] p-4",  // Ensures it is responsive
             title: "text-xl text-center",  // Centers the title
             confirmButton: "bg-green-400 text-black font-bold hover:bg-green-600 outline-none",
-            footer: "text-sm text-left max-h-[50vh] overflow-auto text-center"
+            footer: "text-sm text-left overflow-y-auto text-center max-h-[15vh]"
           },
           footer: failedTestCases > 0
             ? `<strong>Failed Test Cases:</strong><br>
@@ -76,9 +78,6 @@ function POTD() {
       })
       .catch((error) => {
         console.log("Error:", error);
-        setOutput(
-          error.response ? error.response.data.error : "Error executing code"
-        );
       })
       .finally(() => {
         setLoading(false);
